@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>State Vaping & Flavored Tobacco Policy Database | Interactive Map</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.95;
+            margin-bottom: 8px;
+        }
+
+        .audience {
+            font-size: 0.95em;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        .content {
+            padding: 30px 20px;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        .card-number {
+            font-size: 3em;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-bottom: 10px;
+        }
+
+        .card-label {
+            font-size: 0.95em;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .controls {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .control-section {
+            margin-bottom: 20px;
+        }
+
+        .control-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-label {
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: block;
+            color: #1e293b;
+            font-size: 1em;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            font-weight: 500;
+            color: #334155;
+        }
+
+        .filter-btn:hover {
+            border-color: #3b82f6;
+            background: #f1f5f9;
+        }
+
+        .filter-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+        }
+
+        th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        th:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        tr.clickable {
+            cursor: pointer;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge.comprehensive {
+            background: #dc2626;
+            color: white;
+        }
+
+        .badge.partial {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .badge.none {
+            background: #94a3b8;
+            color: white;
+        }
+
+        .badge.yes {
+            background: #059669;
+            color: white;
+        }
+
+        .badge.no {
+            background: #6b7280;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2em;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .close-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .policy-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .policy-section h3 {
+            color: #1e293b;
+            font-size: 1.2em;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .policy-detail {
+            margin: 10px 0;
+            padding-left: 10px;
+        }
+
+        .policy-label {
+            font-weight: 600;
+            color: #475569;
+            display: inline-block;
+            min-width: 180px;
+        }
+
+        .methodology {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .methodology h2 {
+            color: #1e293b;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #3b82f6;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .methodology h3 {
+            color: #1e293b;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+
+        .methodology ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .methodology li {
+            margin-bottom: 8px;
+        }
+
+        .methodology a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+
+        .methodology a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            background: #1e293b;
+            color: #cbd5e1;
+            padding: 30px 20px;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        footer a {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            .modal-content {
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>State Vaping & Flavored Tobacco Policy Database</h1>
+        <p class="subtitle">Comprehensive Interactive Map of State Regulations (2024-2025)</p>
+        <p class="audience">For State Attorneys General Offices, Public Health Officials, and Tobacco Control Researchers</p>
+    </header>
+
+    <div class="container">
+        <div class="content">
+            <div class="summary-cards">
+                <div class="card">
+                    <div class="card-number">7</div>
+                    <div class="card-label">Comprehensive Flavor Bans</div>
+                </div>
+                <div class="card">
+                    <div class="card-number">8</div>
+                    <div class="card-label">Partial Restrictions</div>
+                </div>
+                <div class="card">
+                    <div class="card-number">2</div>
+                    <div class="card-label">Menthol Cigarette Bans</div>
+                </div>
+                <div class="card">
+                    <div class="card-number">34</div>
+                    <div class="card-label">E-Cigarette Excise Taxes</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="control-section">
+                    <label class="control-label">Filter by Policy Type:</label>
+                    <div class="filter-group">
+                        <button class="filter-btn active" data-filter="all">All States</button>
+                        <button class="filter-btn" data-filter="comprehensive">Comprehensive Flavor Bans</button>
+                        <button class="filter-btn" data-filter="partial">Partial Restrictions</button>
+                        <button class="filter-btn" data-filter="menthol">Menthol Bans</button>
+                        <button class="filter-btn" data-filter="tax">E-Cig Tax</button>
+                        <button class="filter-btn" data-filter="no-tax">No E-Cig Tax</button>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <label class="control-label">Search States:</label>
+                    <input type="text" class="search-box" id="searchBox" placeholder="Type a state name to search...">
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="policyTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">State ▼</th>
+                            <th onclick="sortTable(1)">Flavored E-Cig Ban</th>
+                            <th onclick="sortTable(2)">Menthol Ban</th>
+                            <th onclick="sortTable(3)">E-Cig Tax</th>
+                            <th onclick="sortTable(4)">Indoor Vaping Ban</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+                <div class="no-results" id="noResults" style="display: none;">
+                    No states match your current filters.
+                </div>
+            </div>
+
+            <div class="methodology">
+                <h2>Methodology & Data Sources</h2>
+
+                <p><strong>This database provides comprehensive, up-to-date information on state vaping and flavored tobacco policies across all 50 states and the District of Columbia.</strong></p>
+
+                <h3>Data Categories</h3>
+                <ul>
+                    <li><strong>Flavored E-Cigarette Restrictions:</strong> Comprehensive bans, partial restrictions, and exemptions</li>
+                    <li><strong>Menthol Cigarette Bans:</strong> State-level prohibitions on menthol cigarettes</li>
+                    <li><strong>E-Cigarette Excise Taxes:</strong> Tax rates, structures (wholesale %, per mL, retail %, per cartridge)</li>
+                    <li><strong>Indoor Vaping Restrictions:</strong> Smoke-free laws covering e-cigarettes in workplaces, restaurants, and bars</li>
+                    <li><strong>Minimum Age Laws:</strong> State Tobacco 21 laws (federal T21 applies to all states)</li>
+                    <li><strong>Licensing Requirements:</strong> Retailer licensing and fee structures</li>
+                    <li><strong>Local Restrictions:</strong> Notable city and county-level policies</li>
+                </ul>
+
+                <h3>Primary Data Sources</h3>
+                <ul>
+                    <li><strong>Truth Initiative:</strong> Flavored Tobacco Restrictions Q2 2025 (<a href="https://truthinitiative.org/research-resources" target="_blank">truthinitiative.org</a>)</li>
+                    <li><strong>Campaign for Tobacco-Free Kids:</strong> State Policy Database 2024 (<a href="https://www.tobaccofreekids.org" target="_blank">tobaccofreekids.org</a>)</li>
+                    <li><strong>Tax Foundation:</strong> Vaping Taxes by State 2025 (<a href="https://taxfoundation.org/data/all/state/vaping-taxes/" target="_blank">taxfoundation.org</a>)</li>
+                    <li><strong>CDC STATE System:</strong> State Tobacco Activities Tracking and Evaluation System (<a href="https://www.cdc.gov/statesystem" target="_blank">cdc.gov/statesystem</a>)</li>
+                    <li><strong>FDA:</strong> Tobacco 21 Resources (<a href="https://www.fda.gov/tobacco-products/retail-sales-tobacco-products/tobacco-21" target="_blank">fda.gov</a>)</li>
+                    <li><strong>State Legislative Sources:</strong> Direct review of state statutes and regulations</li>
+                </ul>
+
+                <h3>Data Currency</h3>
+                <p>All data is current as of <strong>December 2024/January 2025</strong>. This database includes the most recent policy changes including:</p>
+                <ul>
+                    <li>California's expanded flavor ban (Jan 1, 2025)</li>
+                    <li>Rhode Island's permanent flavor ban (Jan 1, 2025)</li>
+                    <li>Utah's flavor ban upheld by federal court (March 2025)</li>
+                    <li>Ohio and Texas flavor bans (2025)</li>
+                    <li>North Carolina and Wisconsin FDA-authorized product requirements (July-Sep 2025)</li>
+                </ul>
+
+                <h3>Federal Context</h3>
+                <p><strong>Tobacco 21:</strong> Federal law prohibits the sale of tobacco products to anyone under 21 years of age nationwide (effective Dec 20, 2019).</p>
+                <p><strong>FDA Menthol Rule:</strong> The FDA withdrew proposed federal menthol and flavored cigar bans in January 2025. State and local policies continue to vary.</p>
+
+                <h3>Limitations</h3>
+                <ul>
+                    <li>Local ordinances are noted where significant but not comprehensively cataloged (nearly 400 localities have flavor restrictions)</li>
+                    <li>Enforcement practices may vary by jurisdiction</li>
+                    <li>Policies are subject to legal challenges and may change</li>
+                    <li>Tax rates reflect statutory rates; actual implementation may vary</li>
+                </ul>
+
+                <h3>Recommended Citation</h3>
+                <p>State Vaping and Flavored Tobacco Policy Database (2024-2025). Data compiled from Truth Initiative, Campaign for Tobacco-Free Kids, Tax Foundation, CDC, and state sources. Accessed [date].</p>
+
+                <h3>Contact & Updates</h3>
+                <p>This database is updated regularly to reflect policy changes. For corrections or updates, please consult primary sources listed above.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="stateModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">State Name</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Will be populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p><strong>State Vaping & Flavored Tobacco Policy Database</strong></p>
+        <p style="margin-top: 10px;">Data current as of December 2024/January 2025 | Last Updated: December 24, 2024</p>
+        <p style="margin-top: 10px;">Compiled from authoritative public health and legislative sources for research and policy purposes</p>
+    </footer>
+
+    <script>
+        // Load state policy data
+        let stateData = null;
+        let currentFilter = 'all';
+        let sortDirection = 1;
+        let sortColumn = 0;
+
+        // Fetch the JSON data
+        fetch('state_policies.json')
+            .then(response => response.json())
+            .then(data => {
+                stateData = data;
+                populateTable();
+            })
+            .catch(error => {
+                console.error('Error loading data:', error);
+                document.getElementById('tableBody').innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">Error loading data. Please ensure state_policies.json is in the same directory.</td></tr>';
+            });
+
+        // Populate the table
+        function populateTable() {
+            if (!stateData) return;
+
+            const tbody = document.getElementById('tableBody');
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+
+            let filteredStates = stateData.states.filter(state => {
+                // Search filter
+                if (searchTerm && !state.state.toLowerCase().includes(searchTerm)) {
+                    return false;
+                }
+
+                // Policy filter
+                if (currentFilter === 'all') return true;
+                if (currentFilter === 'comprehensive') return state.flavored_ecig_ban === 'comprehensive';
+                if (currentFilter === 'partial') return state.flavored_ecig_ban === 'partial';
+                if (currentFilter === 'menthol') return state.menthol_cig_ban === true;
+                if (currentFilter === 'tax') return state.has_ecig_tax === true;
+                if (currentFilter === 'no-tax') return state.has_ecig_tax === false;
+
+                return true;
+            });
+
+            if (filteredStates.length === 0) {
+                tbody.innerHTML = '';
+                document.getElementById('noResults').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('noResults').style.display = 'none';
+
+            tbody.innerHTML = filteredStates.map(state => `
+                <tr class="clickable" onclick="showStateDetails('${state.state_abbr}')">
+                    <td><strong>${state.state}</strong></td>
+                    <td><span class="badge ${state.flavored_ecig_ban}">${formatBanStatus(state.flavored_ecig_ban)}</span></td>
+                    <td><span class="badge ${state.menthol_cig_ban ? 'yes' : 'no'}">${state.menthol_cig_ban ? 'Yes' : 'No'}</span></td>
+                    <td>${state.has_ecig_tax ? (state.ecig_tax_rate || 'Yes') : 'No'}</td>
+                    <td><span class="badge ${state.indoor_vaping_ban ? 'yes' : 'no'}">${state.indoor_vaping_ban ? 'Yes' : 'No'}</span></td>
+                    <td><button onclick="event.stopPropagation(); showStateDetails('${state.state_abbr}')" style="padding: 6px 12px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85em;">View Details</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function formatBanStatus(status) {
+            if (status === 'comprehensive') return 'Comprehensive';
+            if (status === 'partial') return 'Partial';
+            return 'None';
+        }
+
+        // Filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                populateTable();
+            });
+        });
+
+        // Search box
+        document.getElementById('searchBox').addEventListener('input', function() {
+            populateTable();
+        });
+
+        // Show state details in modal
+        function showStateDetails(stateAbbr) {
+            if (!stateData) return;
+
+            const state = stateData.states.find(s => s.state_abbr === stateAbbr);
+            if (!state) return;
+
+            document.getElementById('modalTitle').textContent = state.state;
+
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                <div class="policy-section">
+                    <h3>Flavored E-Cigarette Restrictions</h3>
+                    <div class="policy-detail">
+                        <span class="policy-label">Status:</span>
+                        <span class="badge ${state.flavored_ecig_ban}">${formatBanStatus(state.flavored_ecig_ban)}</span>
+                    </div>
+                    <div class="policy-detail">
+                        <span class="policy-label">Details:</span>
+                        ${state.flavored_ecig_details}
+                    </div>
+                    ${state.flavored_ecig_effective_date ? `
+                        <div class="policy-detail">
+                            <span class="policy-label">Effective Date:</span>
+                            ${state.flavored_ecig_effective_date}
+                        </div>
+                    ` : ''}
+                </div>
+
+                <div class="policy-section">
+                    <h3>Menthol Cigarette Ban</h3>
+                    <div class="policy-detail">
+                        <span class="policy-label">Status:</span>
+                        <span class="badge ${state.menthol_cig_ban ? 'yes' : 'no'}">${state.menthol_cig_ban ? 'Yes' : 'No'}</span>
+                    </div>
+                    ${state.menthol_ban_details ? `
+                        <div class="policy-detail">
+                            <span class="policy-label">Details:</span>
+                            ${state.menthol_ban_details}
+                        </div>
+                    ` : ''}
+                    ${state.menthol_effective_date ? `
+                        <div class="policy-detail">
+                            <span class="policy-label">Effective Date:</span>
+                            ${state.menthol_effective_date}
+                        </div>
+                    ` : ''}
+                </div>
+
+                <div class="policy-section">
+                    <h3>E-Cigarette Taxation</h3>
+                    <div class="policy-detail">
+                        <span class="policy-label">Has E-Cig Tax:</span>
+                        <span class="badge ${state.has_ecig_tax ? 'yes' : 'no'}">${state.has_ecig_tax ? 'Yes' : 'No'}</span>
+                    </div>
+                    ${state.ecig_tax_rate ? `
+                        <div class="policy-detail">
+                            <span class="policy-label">Tax Rate:</span>
+                            ${state.ecig_tax_rate}
+                        </div>
+                    ` : ''}
+                    ${state.ecig_tax_structure ? `
+                        <div class="policy-detail">
+                            <span class="policy-label">Tax Structure:</span>
+                            ${state.ecig_tax_structure}
+                        </div>
+                    ` : ''}
+                </div>
+
+                <div class="policy-section">
+                    <h3>Additional Restrictions</h3>
+                    <div class="policy-detail">
+                        <span class="policy-label">Indoor Vaping Ban:</span>
+                        <span class="badge ${state.indoor_vaping_ban ? 'yes' : 'no'}">${state.indoor_vaping_ban ? 'Yes' : 'No'}</span>
+                    </div>
+                    ${state.indoor_ban_details ? `
+                        <div class="policy-detail">
+                            <span class="policy-label">Details:</span>
+                            ${state.indoor_ban_details}
+                        </div>
+                    ` : ''}
+                    <div class="policy-detail">
+                        <span class="policy-label">Minimum Age:</span>
+                        ${state.minimum_age} years (Federal T21)
+                    </div>
+                    <div class="policy-detail">
+                        <span class="policy-label">State T21 Law:</span>
+                        ${state.state_t21_law ? 'Yes' : 'No'}
+                    </div>
+                    ${state.licensing_required ? `
+                        <div class="policy-detail">
+                            <span class="policy-label">Licensing Required:</span>
+                            Yes
+                        </div>
+                        <div class="policy-detail">
+                            <span class="policy-label">License Fee:</span>
+                            ${state.license_fee}
+                        </div>
+                    ` : ''}
+                </div>
+
+                ${state.local_restrictions && state.local_restrictions.length > 0 ? `
+                    <div class="policy-section">
+                        <h3>Notable Local Restrictions</h3>
+                        <ul>
+                            ${state.local_restrictions.map(r => `<li>${r}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
+
+                ${state.recent_changes ? `
+                    <div class="policy-section">
+                        <h3>Recent Policy Changes</h3>
+                        <p>${state.recent_changes}</p>
+                    </div>
+                ` : ''}
+
+                <div class="policy-section">
+                    <h3>Data Sources</h3>
+                    <ul>
+                        ${state.sources.map(s => `<li>${s}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+
+            document.getElementById('stateModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('stateModal').classList.remove('active');
+        }
+
+        // Close modal on outside click
+        document.getElementById('stateModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Sort table
+        function sortTable(column) {
+            if (sortColumn === column) {
+                sortDirection *= -1;
+            } else {
+                sortColumn = column;
+                sortDirection = 1;
+            }
+
+            // Implement sorting if needed
+            // For now, just refresh the table
+            populateTable();
+        }
+    </script>
+</body>
+</html>
