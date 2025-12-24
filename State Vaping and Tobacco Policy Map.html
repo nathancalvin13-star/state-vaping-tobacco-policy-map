@@ -574,6 +574,162 @@
                 justify-content: center;
             }
         }
+    
+        .map-visualization {
+            background: white;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        .map-title {
+            font-size: 2em;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .map-description {
+            color: #64748b;
+            margin-bottom: 25px;
+            font-size: 1.05em;
+        }
+
+        .map-container-main {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .us-map {
+            width: 100%;
+            height: auto;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .us-map path {
+            fill: #e2e8f0;
+            stroke: #ffffff;
+            stroke-width: 1.5;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .us-map path:hover {
+            stroke: #1e293b;
+            stroke-width: 2.5;
+            filter: brightness(0.95);
+        }
+
+        .us-map path.comprehensive {
+            fill: #dc2626;
+        }
+
+        .us-map path.partial {
+            fill: #f59e0b;
+        }
+
+        .us-map path.none {
+            fill: #94a3b8;
+        }
+
+        .us-map path.menthol-ban {
+            fill: #8b5cf6;
+        }
+
+        .map-legend-container {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .map-legend h3 {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .legend-swatch {
+            width: 40px;
+            height: 24px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .legend-item span {
+            font-size: 0.95em;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .map-tooltip {
+            position: fixed;
+            background: rgba(0, 0, 0, 0.92);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 0.9em;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 10000;
+            max-width: 350px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .map-tooltip.active {
+            opacity: 1;
+        }
+
+        .map-tooltip h4 {
+            font-size: 1.2em;
+            margin-bottom: 8px;
+            font-weight: 700;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            padding-bottom: 6px;
+        }
+
+        .map-tooltip p {
+            margin: 5px 0;
+            line-height: 1.6;
+        }
+
+        .map-tooltip .badge {
+            margin-top: 8px;
+        }
+
+        @media (max-width: 1024px) {
+            .map-container-main {
+                grid-template-columns: 1fr;
+            }
+
+            .map-legend-container {
+                order: -1;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -646,7 +802,49 @@
                 </div>
             </div>
 
-            <div class="table-container">
+            
+        <div class="map-visualization">
+            <h2 class="map-title">
+                <svg viewBox="0 0 24 24" style="width: 30px; height: 30px; fill: #667eea;">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                </svg>
+                Interactive US Map
+            </h2>
+            <p class="map-description">Click or hover over any state to view detailed policy information</p>
+            
+            <div class="map-container-main">
+                <svg id="usMap" viewBox="0 0 960 600" class="us-map">
+                    <!-- US Map will be populated by JavaScript -->
+                </svg>
+                
+                <div class="map-legend-container">
+                    <div class="map-legend">
+                        <h3>Map Legend</h3>
+                        <div class="legend-item">
+                            <div class="legend-swatch" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);"></div>
+                            <span>Comprehensive Flavor Ban</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-swatch" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);"></div>
+                            <span>Partial Restrictions</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-swatch" style="background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);"></div>
+                            <span>No Statewide Restrictions</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-swatch" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);"></div>
+                            <span>Menthol Ban (CA, MA)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="mapTooltip" class="map-tooltip"></div>
+        </div>
+
+
+        <div class="table-container">
                 <table id="policyTable">
                     <thead>
                         <tr>
@@ -2099,6 +2297,7 @@
                 this.classList.add('active');
                 currentFilter = this.dataset.filter;
                 populateTable();
+                updateMapColors(); // Update map colors when filter changes
             });
         });
 
@@ -2259,6 +2458,156 @@
             // For now, just refresh the table
             populateTable();
         }
+    
+
+        // US Map state paths (simplified coordinates)
+        const usMapPaths = {
+            'AL': 'M 719 397 l 0 91 l -68 0 l 4 -66 l 19 -26 z',
+            'AK': 'M 100 500 l 50 0 l 0 40 l -50 0 z',
+            'AZ': 'M 173 326 l 0 120 l -80 0 l 8 -115 z',
+            'AR': 'M 530 305 l 75 0 l 0 87 l -75 3 z',
+            'CA': 'M 50 150 l 30 150 l -15 100 l -45 -30 l -10 -180 z',
+            'CO': 'M 280 210 l 110 0 l 0 82 l -110 0 z',
+            'CT': 'M 850 152 l 20 0 l 0 15 l -20 0 z',
+            'DE': 'M 827 225 l 12 0 l 0 25 l -12 0 z',
+            'FL': 'M 745 445 l 60 90 l -25 20 l -50 -80 l -20 -20 z',
+            'GA': 'M 698 360 l 55 0 l 0 80 l -55 0 z',
+            'HI': 'M 250 520 l 40 0 l 0 30 l -40 0 z',
+            'ID': 'M 180 50 l 45 0 l -5 150 l -40 -10 z',
+            'IL': 'M 595 215 l 35 0 l 0 120 l -35 0 z',
+            'IN': 'M 642 220 l 35 0 l 0 100 l -35 0 z',
+            'IA': 'M 515 175 l 75 0 l 0 65 l -75 0 z',
+            'KS': 'M 420 255 l 110 0 l 0 60 l -110 0 z',
+            'KY': 'M 660 265 l 80 0 l 0 45 l -80 0 z',
+            'LA': 'M 540 425 l 65 0 l 10 55 l -75 -10 z',
+            'ME': 'M 880 40 l 25 0 l 0 90 l -25 0 z',
+            'MD': 'M 795 235 l 35 0 l 0 20 l -35 0 z',
+            'MA': 'M 865 135 l 30 0 l 0 18 l -30 0 z',
+            'MI': 'M 650 120 l 50 0 l 0 90 l -50 0 z',
+            'MN': 'M 500 80 l 75 0 l 0 95 l -75 0 z',
+            'MS': 'M 600 360 l 40 0 l 0 95 l -40 0 z',
+            'MO': 'M 540 245 l 70 0 l 0 85 l -70 0 z',
+            'MT': 'M 230 65 l 130 0 l 0 85 l -130 0 z',
+            'NE': 'M 380 180 l 115 0 l 0 60 l -115 0 z',
+            'NV': 'M 100 180 l 60 0 l 15 110 l -70 -15 z',
+            'NH': 'M 870 95 l 18 0 l 0 50 l -18 0 z',
+            'NJ': 'M 835 200 l 20 0 l 0 40 l -20 0 z',
+            'NM': 'M 280 310 l 85 0 l 0 110 l -85 0 z',
+            'NY': 'M 790 135 l 60 0 l 0 70 l -60 0 z',
+            'NC': 'M 750 290 l 90 0 l 0 45 l -90 0 z',
+            'ND': 'M 390 70 l 90 0 l 0 75 l -90 0 z',
+            'OH': 'M 700 215 l 55 0 l 0 75 l -55 0 z',
+            'OK': 'M 420 320 l 105 0 l 0 60 l -105 0 z',
+            'OR': 'M 75 100 l 90 0 l 0 70 l -90 0 z',
+            'PA': 'M 760 185 l 65 0 l 0 55 l -65 0 z',
+            'RI': 'M 875 160 l 12 0 l 0 12 l -12 0 z',
+            'SC': 'M 755 335 l 60 0 l 0 50 l -60 0 z',
+            'SD': 'M 390 150 l 95 0 l 0 70 l -95 0 z',
+            'TN': 'M 640 310 l 105 0 l 0 35 l -105 0 z',
+            'TX': 'M 370 385 l 0 125 l 130 0 l 20 -125 z',
+            'UT': 'M 225 210 l 70 0 l 0 100 l -70 0 z',
+            'VT': 'M 855 105 l 15 0 l 0 50 l -15 0 z',
+            'VA': 'M 765 255 l 75 0 l 0 40 l -75 0 z',
+            'WA': 'M 120 35 l 85 0 l 0 60 l -85 0 z',
+            'WV': 'M 740 245 l 45 0 l 0 45 l -45 0 z',
+            'WI': 'M 590 110 l 50 0 l 0 95 l -50 0 z',
+            'WY': 'M 290 140 l 90 0 l 0 75 l -90 0 z',
+            'DC': 'M 815 245 l 8 0 l 0 8 l -8 0 z'
+        };
+
+        // Create and populate the map
+        function createUSMap() {
+            if (!stateData) return;
+
+            const mapSvg = document.getElementById('usMap');
+            if (!mapSvg) return;
+
+            // Clear existing content
+            mapSvg.innerHTML = '';
+
+            // Add each state to the map
+            Object.keys(usMapPaths).forEach(stateAbbr => {
+                const stateInfo = stateData.states.find(s => s.state_abbr === stateAbbr);
+                if (!stateInfo) return;
+
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', usMapPaths[stateAbbr]);
+                path.setAttribute('data-state', stateAbbr);
+                
+                // Color code based on current filter or default to flavor ban status
+                let cssClass = '';
+                if (currentFilter === 'menthol' || stateInfo.menthol_cig_ban) {
+                    cssClass = stateInfo.menthol_cig_ban ? 'menthol-ban' : stateInfo.flavored_ecig_ban;
+                } else {
+                    cssClass = stateInfo.flavored_ecig_ban;
+                }
+                path.setAttribute('class', cssClass);
+
+                // Add hover and click events
+                path.addEventListener('mouseenter', (e) => showMapTooltip(e, stateInfo));
+                path.addEventListener('mousemove', (e) => moveMapTooltip(e));
+                path.addEventListener('mouseleave', hideMapTooltip);
+                path.addEventListener('click', () => showStateDetails(stateAbbr));
+
+                mapSvg.appendChild(path);
+            });
+        }
+
+        // Show tooltip on hover
+        function showMapTooltip(event, stateInfo) {
+            const tooltip = document.getElementById('mapTooltip');
+            if (!tooltip) return;
+
+            let tooltipHTML = `
+                <h4>${stateInfo.state}</h4>
+                <p><strong>Flavored E-Cigs:</strong> <span class="badge ${stateInfo.flavored_ecig_ban}">${formatBanStatus(stateInfo.flavored_ecig_ban)}</span></p>
+                <p><strong>Menthol Ban:</strong> ${stateInfo.menthol_cig_ban ? 'Yes' : 'No'}</p>
+                <p><strong>E-Cig Tax:</strong> ${stateInfo.has_ecig_tax ? 'Yes' : 'No'}</p>
+            `;
+
+            if (stateInfo.ecig_tax_rate && stateInfo.has_ecig_tax) {
+                const rate = stateInfo.ecig_tax_rate.length > 50 ? 
+                    stateInfo.ecig_tax_rate.substring(0, 50) + '...' : 
+                    stateInfo.ecig_tax_rate;
+                tooltipHTML += `<p><strong>Tax Rate:</strong> ${rate}</p>`;
+            }
+
+            tooltipHTML += `<p style="margin-top: 10px; font-size: 0.85em; opacity: 0.8;">Click for full details</p>`;
+
+            tooltip.innerHTML = tooltipHTML;
+            tooltip.classList.add('active');
+            
+            moveMapTooltip(event);
+        }
+
+        // Move tooltip with mouse
+        function moveMapTooltip(event) {
+            const tooltip = document.getElementById('mapTooltip');
+            if (!tooltip) return;
+
+            tooltip.style.left = (event.clientX + 15) + 'px';
+            tooltip.style.top = (event.clientY + 15) + 'px';
+        }
+
+        // Hide tooltip
+        function hideMapTooltip() {
+            const tooltip = document.getElementById('mapTooltip');
+            if (tooltip) {
+                tooltip.classList.remove('active');
+            }
+        }
+
+        // Update map colors when filter changes
+        function updateMapColors() {
+            createUSMap();
+        }
+
+        // Initialize map when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            populateTable();
+            createUSMap();
+        });
+
     </script>
 </body>
 </html>
